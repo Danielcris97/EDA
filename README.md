@@ -6,4 +6,4 @@
 3. ¿En que se ocupan los migrantes?
 4. ¿Beneficio de la migracion? 
 5. ¿Qué trabajos hacen los inmigrantes?
-6. ¿Qué porcentaje de la población, latina y extranjera, han realizado crímenes?
+6. ¿Qué porcentaje de la población, española y extranjera, han realizado crímenes?

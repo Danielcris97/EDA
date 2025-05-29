@@ -107,3 +107,38 @@ pobreza_filtro = vr.pobreza[vr.pobreza["Nacionalidad"].str.lower() != "total"]
 agg_pobreza = pobreza_filtro.groupby("Nacionalidad")["Total"].mean().reset_index()
 utils.grafica_pobreza1(agg_pobreza)
 utils.grafica_pobreza2(agg_pobreza)
+ 
+#11 Heatmap correlaciones
+# --- Preparar tasas relativas ---
+df_tasas = df_corr[["Año"]].copy()
+
+# Tasa de delitos = delitos / población extranjera
+df_tasas["Tasa_Delitos"] = df_corr["DelitosTotales"] / df_corr["PoblacionExtranjera"]
+
+# Tasa de empleo (ya es un porcentaje)
+empleo_media = comparacion.groupby("Periodo")["Total"].mean().reset_index().rename(columns={"Periodo": "Año", "Total": "Tasa_Empleo"})
+df_tasas = pd.merge(df_tasas, empleo_media, on="Año", how="left")
+
+# Tasa de paro
+paro_media = paro_filtro.groupby("periodo")["Total"].mean().reset_index().rename(columns={"periodo": "Año", "Total": "Tasa_Paro"})
+df_tasas = pd.merge(df_tasas, paro_media, on="Año", how="left")
+
+# Tasa NEET
+neet_media = agg_janual.groupby("Periodo")["Total"].mean().reset_index().rename(columns={"Periodo": "Año", "Total": "Tasa_NEET"})
+df_tasas = pd.merge(df_tasas, neet_media, on="Año", how="left")
+
+# Tasa pobreza
+vr.pobreza.columns = vr.pobreza.columns.str.strip().str.lower()
+pobreza_media = vr.pobreza.groupby("periodo")["total"].mean().reset_index().rename(columns={"periodo": "Año", "total": "Tasa_Pobreza"})
+df_tasas = pd.merge(df_tasas, pobreza_media, on="Año", how="left")
+
+
+
+matriz_tasas = df_tasas.drop(columns=["Año"]).corr()
+
+plt.figure(figsize=(10, 7))
+sns.heatmap(matriz_tasas, annot=True, cmap="coolwarm", linewidths=0.5)
+plt.title("Correlación entre Tasas Sociales (2015–2022)")
+plt.tight_layout()
+plt.savefig("../visualizaciones/heatmap_tasas_sociales.png")
+plt.close()
